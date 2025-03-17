@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
 let countdown = 29;
 let period = 1;
 let history = [];
+let currentResult = null;
 
 function generateResult() {
     let randomNum = Math.floor(Math.random() * 10);
@@ -33,6 +34,7 @@ function generateResult() {
     let result = { period, number: randomNum, bigSmall, color: randomColor };
     history.push(result);
     period++;
+    currentResult = result;
     return result;
 }
 
@@ -40,7 +42,8 @@ function broadcastGameState() {
     io.emit('gameState', {
         countdown: countdown,
         period: period,
-        history: history
+        history: history,
+        currentResult: currentResult // Send the current result
     });
 }
 
@@ -61,6 +64,12 @@ io.on('connection', (socket) => {
     socket.emit('history', history);
     socket.emit('countdown', countdown);
     broadcastGameState();
+
+    socket.on('placeBet', (bet) => {
+        // Handle bet placement logic here (validate, store, etc.)
+        console.log('Bet placed:', bet);
+        // You might want to store bets and process them when the round ends
+    });
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
