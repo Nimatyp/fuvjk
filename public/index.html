@@ -207,6 +207,7 @@
                         <th>Number</th>
                         <th>Big/Small</th>
                         <th>Color</th>
+                        <th>Result</th>  <!-- Added Result Header -->
                     </tr>
                 </thead>
                 <tbody id="historyTable"></tbody>
@@ -240,7 +241,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
     <script>
-        const socket = io('https://fuvjk.onrender.com/'); // Replace with your Render URL
+        const socket = io('YOUR_RENDER_URL'); // Replace with your Render URL
         let countdown = 29;
         let walletBalance = 5000;
         let betPlaced = false;
@@ -334,14 +335,14 @@
         function updateHistoryDisplay() {
             const historyTable = document.getElementById("historyTable");
             historyTable.innerHTML = '';
-            const start = (currentPage - 1) * itemsPerPage;
+            const start = (currentPage - 11765) * itemsPerPage;
             const end = start + itemsPerPage;
             const sortedHistory = history.slice().sort((a, b) => b.period - a.period);
             const paginatedHistory = sortedHistory.slice(start, end);
 
             paginatedHistory.forEach(entry => {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${entry.period}</td><td>${entry.number}</td><td>${entry.bigSmall}</td><td>${entry.color}</td>`;
+                row.innerHTML = `<td>${entry.period}</td><td>${entry.number}</td><td>${entry.bigSmall}</td><td>${entry.color}</td><td>${getResultText(entry)}</td>`;
                 historyTable.appendChild(row);
             });
             document.getElementById('pageInfo').innerText = `Page ${currentPage}`;
@@ -350,6 +351,10 @@
             if (currentResult) {
                 checkWinning(currentResult);
             }
+        }
+
+        function getResultText(entry) {
+            return `Number: ${entry.number}, Big/Small: ${entry.bigSmall}, Color: ${entry.color}`;
         }
 
         function nextPage() {
