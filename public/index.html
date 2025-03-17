@@ -241,7 +241,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
     <script>
-        const socket = io('https://fuvjk.onrender.com/'); // Replace with your Render URL
+        const socket = io('YOUR_RENDER_URL'); // Replace with your Render URL
         let countdown = 29;
         let walletBalance = 5000;
         let betPlaced = false;
@@ -335,7 +335,7 @@
         function updateHistoryDisplay() {
             const historyTable = document.getElementById("historyTable");
             historyTable.innerHTML = '';
-            const start = (currentPage - 11765) * itemsPerPage;
+            const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const sortedHistory = history.slice().sort((a, b) => b.period - a.period);
             const paginatedHistory = sortedHistory.slice(start, end);
