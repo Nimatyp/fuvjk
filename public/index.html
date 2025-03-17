@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Betting Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1E2A32;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #1E2A32;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header img {
+            height: 40px;
+            width: auto;
+            margin: 0 5px;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 20px auto;
+            background: #1E2A32;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: yellow;
+        }
+        .wallet h3 {
+            margin: 5px 0;
+        }
+        .numbers, .bigsmall, .colors {
+            margin: 15px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        button:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+        .selected {
+            background-color: black !important;
+            color: rgb(20, 130, 221) !important;
+        }
+        .numbers button { background: #ffeb3b; color: #222; }
+        .bigsmall button:nth-child(1) { background: #ff5722; color: white; }
+        .bigsmall button:nth-child(2) { background: #4caf50; color: white; }
+        .colors button:nth-child(1) { background: #00bcd4; color: white; }
+        .colors button:nth-child(2) { background: #9c27b0; color: white; }
+        .colors button:nth-child(3) { background: #e91e63; color: white; }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #1E2A32;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Time's Up overlay screen */
+        .countdown-screen {
+            display: none;
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+        }
+        /* History Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            color: black;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+        th { background: #ff9800; color: white; }
+        .pagination {
+            margin-top: 10px;
+        }
+        .pagination button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <img src="Red Classic Modern Gambling Badge Casino Logo (1).png" alt="Logo">
+        <div>
+            <img src="player.png" alt="Player">
+            <img src="operator (1).png" alt="Operator">
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="wallet">
+            <h3>Wallet Balance: <span id="walletBalance">5000</span> Rs</h3>
+        </div>
+        <div class="timer">Time Remaining: <span id="countdown">29</span>s</div>
+
+        <!-- Betting Options -->
+        <div class="numbers">
+            <h3>Select a Number</h3>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">0</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">1</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">2</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">3</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">4</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">5</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">6</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">7</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">8</button>
+            <button onclick="toggleSelection(this, 'numbers', 'number')">9</button>
+        </div>
+
+        <div class="bigsmall">
+            <h3>Choose Big or Small</h3>
+            <button onclick="toggleSelection(this, 'bigsmall', 'bigSmall')">Big</button>
+            <button onclick="toggleSelection(this, 'bigsmall', 'bigSmall')">Small</button>
+        </div>
+
+        <div class="colors">
+            <h3>Choose a Color</h3>
+            <button onclick="toggleSelection(this, 'colors', 'color')">Green</button>
+            <button onclick="toggleSelection(this, 'colors', 'color')">Violet</button>
+            <button onclick="toggleSelection(this, 'colors', 'color')">Red</button>
+        </div>
+
+        <!-- Game History -->
+        <div class="history">
+            <h3>Game History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Number</th>
+                        <th>Big/Small</th>
+                        <th>Color</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+            <div class="pagination">
+                <button onclick="prevPage()">Previous</button>
+                <span id="pageInfo">Page 1</span>
+                <button onclick="nextPage()">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bet Modal -->
+    <div id="betModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Enter Bet Amount</h3>
+            <label for="modalBetAmount">Bet Amount:</label>
+            <input type="number" id="modalBetAmount" min="1" max="5000" value="100">
+            <button onclick="confirmBet()">Confirm Bet</button>
+        </div>
+    </div>
+
+    <!-- Time's Up Screen -->
+    <div id="countdownScreen" class="countdown-screen">
+        <div id="countdownText">Time's Up!</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script>
+        const socket = io('YOUR_RENDER_URL'); // Replace with your Render URL
+        let countdown = 29;
+        let walletBalance = 5000;
+        let betPlaced = false;
+        let selectedElement = null;
+        let selectedCategory = null;
+        let selectedValue = null;
+        let history = [];
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        socket.on('gameState', (gameState) => {
+            countdown = gameState.countdown;
+            history = gameState.history;
+            updateCountdown();
+            updateHistoryDisplay();
+        });
+
+        function updateCountdown() {
+            document.getElementById('countdown').innerText = countdown;
+        }
+
+        function toggleSelection(element, category, value) {
+            const categoryDiv = element.parentNode;
+            const previouslySelected = categoryDiv.querySelector('.selected');
+
+            if (previouslySelected) {
+                previouslySelected.classList.remove('selected');
+            }
+
+            element.classList.add('selected');
+            selectedElement = element;
+            selectedCategory = category;
+            selectedValue = value;
+            openModal();
+        }
+
+        function resetSelections() {
+            document.querySelectorAll('.numbers button, .bigsmall button, .colors button').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = false;
+            });
+            selectedElement = null;
+            selectedCategory = null;
+            selectedValue = null;
+        }
+
+        function updateWallet(amount) {
+            walletBalance += amount;
+            document.getElementById('walletBalance').innerText = walletBalance;
+        }
+
+        function placeBet(betAmount) {
+            if (betAmount > walletBalance) {
+                alert("You don't have enough balance to place this bet!");
+                return;
+            }
+            if (betAmount < 1) {
+                alert("Bet amount must be at least 1 Rs!");
+                return;
+            }
+            updateWallet(-betAmount);
+            betPlaced = true;
+            alert(`Bet of ${betAmount} Rs placed successfully!`);
+        }
+
+        function showWinningMessage(details) {
+            const winningMessage = document.createElement('div');
+            winningMessage.id = 'winningMessage';
+            winningMessage.innerHTML = `
+                <h2>You Won!</h2>
+                <p>Bet Amount: ${details.betAmount} Rs</p>
+                <p>You Bet On: ${details.betOn}</p>
+                <p>Winnings: ${details.winnings} Rs</p>
+                <p>Number: ${details.number || 'N/A'}</p>
+                <p>Big/Small: ${details.bigSmall || 'N/A'}</p>
+                <p>Color: ${details.color || 'N/A'}</p>
+            `;
+            document.body.appendChild(winningMessage);
+            setTimeout(() => { winningMessage.remove(); }, 5000);
+        }
+
+        function updateHistoryDisplay() {
+            const historyTable = document.getElementById("historyTable");
+            historyTable.innerHTML = '';
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const sortedHistory = history.slice().sort((a, b) => b.period - a.period);
+            const paginatedHistory = sortedHistory.slice(start, end);
+
+            paginatedHistory.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${entry.period}</td><td>${entry.number}</td><td>${entry.bigSmall}</td><td>${entry.color}</td>`;
+                historyTable.appendChild(row);
+            });
+            document.getElementById('pageInfo').innerText = `Page ${currentPage}`;
+        }
+
+        function nextPage() {
+            if ((currentPage * itemsPerPage) < history.length) {
+                currentPage++;
+                updateHistoryDisplay();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateHistoryDisplay();
+            }
+        }
+
+        function openModal() {
+            document.getElementById('betModal').style.display = 'flex';
+        }
+
+        function confirmBet() {
+            const betAmount = parseInt(document.getElementById('modalBetAmount').value);
+            placeBet(betAmount);
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('betModal').style.display = 'none';
+        }
+
+        function showCountdownScreen() {
+            document.getElementById('countdownScreen').style.display = 'flex';
+        }
+
+        function hideCountdownScreen() {
+            document.getElementById('countdownScreen').style.display = 'none';
+        }
+
+        function checkWinning(result) {
+            const betAmount = parseInt(document.getElementById('modalBetAmount').value);
+            let winnings = 0;
+            let betOnValue = selectedElement.innerText;
+            let won = false;
+
+            if (selectedCategory === 'numbers' && selectedElement.innerText == result.number) {
+                winnings = betAmount * 2;
+                won = true;
+            } else if (selectedCategory === 'bigsmall' && selectedElement.innerText.toLowerCase() == result.bigSmall.toLowerCase()) {
+                winnings = betAmount * 2;
+                won = true;
+            } else if (selectedCategory === 'colors' && selectedElement.innerText.toLowerCase() == result.color.toLowerCase()) {
+                winnings = betAmount * 2;
+                won = true;
+            }
+            if (won) {
+                updateWallet(winnings);
+                showWinningMessage({
+                    betAmount,
+                    betOn: betOnValue,
+                    winnings,
+                    number: result.number,
+                    bigSmall: result.bigSmall,
+                    color: result.color
+                });
+            }
+            return won;
+        }
+
+        // Close modal if clicking outside modal content
+        window.onclick = function(event) {
+            const modal = document.getElementById('betModal');
+            if (event.target == modal) { closeModal(); }
+        }
+    </script>
+</body>
+</html>
